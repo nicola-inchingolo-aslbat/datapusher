@@ -32,6 +32,17 @@ MAX_CONTENT_LENGTH = web.app.config.get('MAX_CONTENT_LENGTH') or 10485760
 CHUNK_SIZE = 16 * 1024 # 16kb
 DOWNLOAD_TIMEOUT = 30
 
+### ASLBAT ###
+# See also ckan/ckanext/datapusher/logic/action.py
+#
+# LOGGING NOTE:
+# For logging the level is over info. Use logging.error to print message to standard output.
+# Do not use logger in the push_to_datastore function, it logs message to
+# ckan. Use logging.....
+#
+# SSL_VERIFY NOTE:
+# Here this variable does not work, it overlaps with ckan global variable
+# To disable SSL_VERIFY set SSL_VERIFY = False also in the else
 if web.app.config.get('SSL_VERIFY') in ['False', 'FALSE', '0', False, 0]:
     SSL_VERIFY = False
 else:
