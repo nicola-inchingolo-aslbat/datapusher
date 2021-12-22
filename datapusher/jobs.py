@@ -345,7 +345,8 @@ def push_to_datastore(task_id, input, dry_run=False):
     
     # replace original_url_base with callback_url_base
     logging.debug("----------CKAN URL------BEFORE: %s" % ckan_url)
-    ckan_url = replace_original_url_base_with_callback_url_base(ckan_url, original_url_base, callback_url_base)
+    if original_url_base:
+        ckan_url = replace_original_url_base_with_callback_url_base(ckan_url, original_url_base, callback_url_base)
     logging.debug("----------CKAN URL------AFTER*: %s" % ckan_url)
     ### ASLBAT ###
     
@@ -367,7 +368,8 @@ def push_to_datastore(task_id, input, dry_run=False):
     ### ASLBAT ###
     # replace original_url_base with callback_url_base
     logging.debug("----------*****URL------BEFORE: %s" % url)
-    url = replace_original_url_base_with_callback_url_base(url, original_url_base, callback_url_base)
+    if original_url_base:
+        url = replace_original_url_base_with_callback_url_base(url, original_url_base, callback_url_base)
     logging.debug("----------*****URL------AFTER*: %s" % url)
     ### ASLBAT ###
 
