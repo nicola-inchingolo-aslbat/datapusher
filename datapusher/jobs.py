@@ -294,6 +294,23 @@ def validate_input(input):
     if not input.get('api_key'):
         raise util.JobError('No CKAN API key provided')
 
+### ASLBAT ###
+def replace_original_url_base_with_callback_url_base(url, original_url_base, callback_url_base):
+    # Replace original_base_url, with callback_url_base in the url variable
+    # example:
+    # callback_url_base: http://ckan:5000/
+    # original_base_url: https://ckanportal.mydomain.com
+    #
+    # url:
+    # before: https://ckanportal.mydomain.com/dataset/515fa5c0-058e-4b53-b5ed-74ff38aca428/resource/203de699-c2fc-40f7-a740-0369a2ebaa78/download/test.csv
+    # after:  http://ckan:5000/dataset/515fa5c0-058e-4b53-b5ed-74ff38aca428/resource/203de699-c2fc-40f7-a740-0369a2ebaa78/download/test.csv
+    if (original_url_base):
+        original_url_base_strip = original_url_base.rstrip("/")
+        callback_url_base_strip = callback_url_base.rstrip("/")
+        url = url.replace(original_url_base_strip, callback_url_base_strip)
+    
+    return url
+### ASLBAT ###
 
 @job.async
 def push_to_datastore(task_id, input, dry_run=False):
@@ -322,6 +339,16 @@ def push_to_datastore(task_id, input, dry_run=False):
     resource_id = data['resource_id']
     api_key = input.get('api_key')
 
+    ### ASLBAT ###
+    original_url_base = data['original_url_base']
+    callback_url_base = data['callback_url_base']
+    
+    # replace original_url_base with callback_url_base
+    logging.debug("----------CKAN URL------BEFORE: %s" % ckan_url)
+    ckan_url = replace_original_url_base_with_callback_url_base(ckan_url, original_url_base, callback_url_base)
+    logging.debug("----------CKAN URL------AFTER*: %s" % ckan_url)
+    ### ASLBAT ###
+    
     try:
         resource = get_resource(resource_id, ckan_url, api_key)
     except util.JobError, e:
@@ -336,6 +363,14 @@ def push_to_datastore(task_id, input, dry_run=False):
 
     # check scheme
     url = resource.get('url')
+    
+    ### ASLBAT ###
+    # replace original_url_base with callback_url_base
+    logging.debug("----------*****URL------BEFORE: %s" % url)
+    url = replace_original_url_base_with_callback_url_base(url, original_url_base, callback_url_base)
+    logging.debug("----------*****URL------AFTER*: %s" % url)
+    ### ASLBAT ###
+
     scheme = urlparse.urlsplit(url).scheme
     if scheme not in ('http', 'https', 'ftp'):
         raise util.JobError(
